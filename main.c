@@ -1,4 +1,5 @@
 #include <stdio.h>
+
 #define QUANTIDADE_INGRESSOS 1000
 #define ALUNO 1
 #define COMUNIDADE 2
@@ -12,24 +13,12 @@ typedef struct Bebida{
 } Bebida;
 
 // Entidades
-typedef struct Aluno{
-    char nome[100];
-    float credito;
-} Aluno;
-
-typedef struct Idoso{
-    char nome[100];
-} Idoso;
-
-typedef struct Comunidade{
-    char nome[100];
-} Comunidade;
-
-// Filas
 typedef struct FilaPessoas{
     int id;
     char nome[100];
 } FilaPessoas;
+
+// Filas
 
 typedef struct FilaGeral{
     FilaPessoas idosos;
@@ -45,6 +34,9 @@ int comprar_creditos(){
 int main(){
     return 0;
 }
+
+
+// Colocar data: antes do dia 28: 3 ingressos. No dia: ordem, sem 3
 
 
 
