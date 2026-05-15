@@ -60,12 +60,58 @@ int inicializarTodasFilas(Fila* fAlunos, Fila* fComunidade, Fila* fIdosos) {
     return 1;
 }
 
+// Verifica a possibilidade de compra de ingresso.
+// Chamar somente if data < 28. else não precisa verificar
+int podeComprarMaisIngressos(char cpf[15], int identificador, Fila *fila){
+    if(fila == NULL){ return 0; }
+
+    int podeContinuar = identificador == (IDENTIFICADOR_ALUNO || IDENTIFICADOR_COMUNIDADE || IDENTIFICADOR_IDOSO);
+    if(!podeContinuar){
+        return 0;
+    }
+
+    Pessoa *primeiroFila = fila->inicio;
+    int contadorIngressosAluno = 0;
+    int contadorIdososComunidade = 0;
+
+    while(primeiroFila != NULL){
+        // Se achou o usuário
+        if(strcmp(primeiroFila->cpf, cpf) == 0){
+            if(identificador == IDENTIFICADOR_ALUNO){
+                contadorIngressosAluno++;
+
+            } else{
+                contadorIdososComunidade++;
+            }
+        }
+
+        primeiroFila = primeiroFila->proximaPessoa;
+    }
+
+    // É aluno
+    if(identificador == IDENTIFICADOR_ALUNO){
+        if(contadorIngressosAluno < 3){
+            return 1;
+        } else{
+            return 0;
+        }
+    }
+
+    // É comunidade OU idosos
+    if(contadorIdososComunidade >= 1){
+        return 0;
+    }
+
+    return 1;
+}
+
+// Essa é a função de "comprar ingressos"
 int enfileirar(Fila* fila, char nome[255], char cpf[15], int identificador) {
     if (fila == NULL) {
         return 0;
     }
-    Pessoa* novoAluno = (Pessoa*)malloc(sizeof(Pessoa));
 
+    Pessoa* novoAluno = (Pessoa*)malloc(sizeof(Pessoa));
     if (novoAluno == NULL) {
         return 0;
     }
@@ -213,10 +259,14 @@ int main(){
 
                 int numeroFila = destinarFila(identificadorPessoa);
 
+                
+
                 // Verifica qual é a fila destinada
                 if (numeroFila != 0) {
                     if (numeroFila == IDENTIFICADOR_ALUNO) {
                         enfileirar(&filaAlunos, nome, cpf, IDENTIFICADOR_ALUNO);
+                        int podeComprar = podeComprarMaisIngressos(cpf, IDENTIFICADOR_ALUNO, &filaAlunos);
+                        printf("\n%d --- PODE COMPRAR\n", podeComprar);
 
                     } else if (numeroFila == IDENTIFICADOR_IDOSO) {
                         enfileirar(&filaIdosos, nome, cpf, IDENTIFICADOR_IDOSO);
