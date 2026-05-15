@@ -37,6 +37,7 @@ void menu(){
     printf("a - Exibir Fila Alunos\n");
     printf("i - Exibir Fila Idosos\n");
     printf("k - Exibir Fila Comunidade\n");
+    printf("s - Comprar Créditos\n");
 }
 
 // Funções de Fila
@@ -91,10 +92,11 @@ void exibirFila(Fila *fila){
     printf("\n");
     Pessoa *primeiroFila = fila->inicio;
     while(primeiroFila != NULL){
-        printf("Nome: %s | CPF: %s | Identificador: %d\n",
+        printf("Nome: %s | CPF: %s | Identificador: %d | Créditos: R$%.2f\n",
                 primeiroFila->nome,
                 primeiroFila->cpf,
-                primeiroFila->identificador
+                primeiroFila->identificador,
+                primeiroFila->credito
         );
         primeiroFila = primeiroFila->proximaPessoa;
     }
@@ -116,7 +118,7 @@ int destinarFila(int identificador){
 
 // Adiciona créditos no "objeto". Somente para aluno
 // Na chamada da função: colocar verificação para NÃO deixar colocar valor = 0 or < 0
-int comprarCreditos(Pessoa *pessoa, double valorCreditoAdicionar){
+double comprarCreditos(Pessoa *pessoa, double valorCreditoAdicionar){
     if(pessoa == NULL){
         return 0;
     }
@@ -127,6 +129,26 @@ int comprarCreditos(Pessoa *pessoa, double valorCreditoAdicionar){
 
     pessoa->credito += valorCreditoAdicionar;
     return valorCreditoAdicionar;
+}
+
+// Essa função busca uma pessoa de uma fila passada pelo CPF
+// TO DO: ver a possibilidade de um ID incremental para a busca: resolveria o problema de 1 pessoa estar várias vezes (3) na fila
+// - Surgiria a dúvida: esse crédito é para qual ingresso? Já que o aluno pode ter 3
+Pessoa *getPessoa(Fila *fila, char cpfBuscar[15]){
+    if(fila == NULL || is_vazia(fila)){
+        return NULL;
+    }
+
+    Pessoa *primeiroFila = fila->inicio;
+    while(primeiroFila != NULL){
+        if(strcmp(primeiroFila->cpf, cpfBuscar) == 0){
+            return primeiroFila;
+        }
+
+        primeiroFila = primeiroFila->proximaPessoa;
+    }
+
+    return NULL;
 }
 
 int main(){
@@ -184,6 +206,39 @@ int main(){
             case 'a': exibirFila(&filaAlunos); break;
             case 'i': exibirFila(&filaIdosos); break;
             case 'k': exibirFila(&filaComunidade); break;
+            case 's':
+                char cpfBuscar[15];
+                while(getchar() != '\n');
+
+                printf("\nInforme seu CPF: ");
+                fgets(cpfBuscar, 15, stdin);
+                cpfBuscar[strcspn(cpfBuscar, "\n")] = '\0';
+
+                Pessoa *pessoaBuscada = getPessoa(&filaAlunos, cpfBuscar);
+                if(pessoaBuscada == NULL){
+                    printf("\nCPF não pertence a um aluno OU a fila está vazia\n");
+
+                } else{
+                    double valorCreditoColocar;
+                    printf("Informe a quantidade de crédito: ");
+                    scanf("%lf", &valorCreditoColocar);
+
+                    if(valorCreditoColocar <= 0){
+                        printf("\nO valor deve ser maior que R$0.00!\n");
+
+                    } else{
+                        double valorResultado = comprarCreditos(pessoaBuscada, valorCreditoColocar);
+
+                        if(valorResultado == 0){
+                            printf("\nOcorreu algum erro na compra dos créditos!\n");
+
+                        } else{
+                            printf("R$%.2f de créditos adicionado com sucesso!\n", valorResultado);
+                        }
+                    }
+                }
+
+                break;
             default: printf("\nOPÇÃO INVÁLIDA!\n"); break;
         }
     }
