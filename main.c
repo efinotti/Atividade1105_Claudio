@@ -114,6 +114,21 @@ int destinarFila(int identificador){
     else{ return IDENTIFICADOR_IDOSO; }
 }
 
+// Adiciona créditos no "objeto". Somente para aluno
+// Na chamada da função: colocar verificação para NÃO deixar colocar valor = 0 or < 0
+int comprarCreditos(Pessoa *pessoa, double valorCreditoAdicionar){
+    if(pessoa == NULL){
+        return 0;
+    }
+
+    if(pessoa->identificador != IDENTIFICADOR_ALUNO){
+        return 0;
+    }
+
+    pessoa->credito += valorCreditoAdicionar;
+    return valorCreditoAdicionar;
+}
+
 int main(){
     char opcao;
     int continuar = 1;
