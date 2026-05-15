@@ -1,26 +1,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
-#define QUANTIDADE_MAX_INGRESSOS 1000 
+#define QUANTIDADE_MAX_INGRESSOS 1000
 
 // Identificadores que vão dizer o que a pessoa é
 #define IDENTIFICADOR_ALUNO 1
 #define IDENTIFICADOR_COMUNIDADE 2
 #define IDENTIFICADOR_IDOSO 3
 
-// Estrutura base que servirá para todo mundo. Diferenciação APENAS por identificador
-typedef struct Pessoa{
+// Estrutura base que servirá para todo mundo. Diferenciação APENAS por
+// identificador
+typedef struct Pessoa {
     char nome[255];
     int identificador;
     char cpf[15];
     double credito;
-    struct Pessoa *proximaPessoa;
+    struct Pessoa* proximaPessoa;
 } Pessoa;
 
-typedef struct Fila{
-    Pessoa *inicio;
-    Pessoa *fim;
+typedef struct Fila {
+    Pessoa* inicio;
+    Pessoa* fim;
 } Fila;
 
 // STANDBY: Fila geral que vai guardar as outras filas
@@ -32,7 +34,7 @@ typedef struct Fila{
 // } GerenciadorFila;
 
 // Menu para Testes
-void menu(){
+void menu() {
     printf("\nc - Comprar Ingressos\n");
     printf("a - Exibir Fila Alunos\n");
     printf("i - Exibir Fila Idosos\n");
@@ -40,88 +42,93 @@ void menu(){
 }
 
 // Funções de Fila
-int inicializar(Fila *fila){
-    if(fila == NULL){ return 0; }
+int inicializar(Fila* fila) {
+    if (fila == NULL) {
+        return 0;
+    }
     fila->inicio = NULL;
     fila->fim = NULL;
     return 1;
 }
 
 // Essa função apenas centraliza as chamadas de inicialização
-int inicializarTodasFilas(Fila *fAlunos, Fila *fComunidade, Fila *fIdosos){
+int inicializarTodasFilas(Fila* fAlunos, Fila* fComunidade, Fila* fIdosos) {
     inicializar(fAlunos);
     inicializar(fComunidade);
     inicializar(fIdosos);
     return 1;
 }
 
-int enfileirar(Fila *fila, char nome[255], char cpf[15], int identificador){
-    if(fila == NULL){ return 0; }
-    Pessoa *novoAluno = (Pessoa*) malloc(sizeof(Pessoa));
+int enfileirar(Fila* fila, char nome[255], char cpf[15], int identificador) {
+    if (fila == NULL) {
+        return 0;
+    }
+    Pessoa* novoAluno = (Pessoa*)malloc(sizeof(Pessoa));
 
-    if(novoAluno == NULL){ return 0; }
+    if (novoAluno == NULL) {
+        return 0;
+    }
     strcpy(novoAluno->nome, nome);
     strcpy(novoAluno->cpf, cpf);
     novoAluno->identificador = identificador;
     novoAluno->proximaPessoa = NULL;
 
     // Lista Vazia
-    if(fila->inicio == NULL){
+    if (fila->inicio == NULL) {
         fila->inicio = novoAluno;
         fila->fim = novoAluno;
         return 1;
     }
 
-    Pessoa *ultimoAluno = fila->fim;
+    Pessoa* ultimoAluno = fila->fim;
     ultimoAluno->proximaPessoa = novoAluno;
     fila->fim = novoAluno;
     return 1;
 }
 
 // Verifica se a fila está vazia (1 ou 0)
-int is_vazia(Fila *fila){
-    return fila->inicio == NULL;
-}
+int is_vazia(Fila* fila) { return fila->inicio == NULL; }
 
-void exibirFila(Fila *fila){
-    if(fila == NULL || is_vazia(fila)){
+void exibirFila(Fila* fila) {
+    if (fila == NULL || is_vazia(fila)) {
         return;
     }
 
     printf("\n");
-    Pessoa *primeiroFila = fila->inicio;
-    while(primeiroFila != NULL){
-        printf("Nome: %s | CPF: %s | Identificador: %d\n",
-                primeiroFila->nome,
-                primeiroFila->cpf,
-                primeiroFila->identificador
-        );
+    Pessoa* primeiroFila = fila->inicio;
+    while (primeiroFila != NULL) {
+        printf("Nome: %s | CPF: %s | Identificador: %d\n", primeiroFila->nome,
+               primeiroFila->cpf, primeiroFila->identificador);
         primeiroFila = primeiroFila->proximaPessoa;
     }
 }
 
 // Verifica em qual fila a pessoa se encaixa e retorna o índice do identificador
-int destinarFila(int identificador){
-    if(identificador != IDENTIFICADOR_ALUNO &&
+int destinarFila(int identificador) {
+    if (identificador != IDENTIFICADOR_ALUNO &&
         identificador != IDENTIFICADOR_COMUNIDADE &&
-        identificador != IDENTIFICADOR_IDOSO
-    ){
+        identificador != IDENTIFICADOR_IDOSO) {
         return 0;
     }
 
-    if(identificador == IDENTIFICADOR_ALUNO){ return IDENTIFICADOR_ALUNO; }
-    else if(identificador == IDENTIFICADOR_COMUNIDADE){ return IDENTIFICADOR_COMUNIDADE; }
-    else{ return IDENTIFICADOR_IDOSO; }
+    if (identificador == IDENTIFICADOR_ALUNO) {
+        return IDENTIFICADOR_ALUNO;
+    } else if (identificador == IDENTIFICADOR_COMUNIDADE) {
+        return IDENTIFICADOR_COMUNIDADE;
+    } else {
+        return IDENTIFICADOR_IDOSO;
+    }
 }
 
 // Adiciona créditos no "objeto". Somente para aluno
-// Na chamada da função: colocar verificação para NÃO deixar colocar valor = 0 or < 0
-int comprarCreditos(Pessoa *pessoa, double valorCreditoAdicionar){
-    if(pessoa == NULL){
+// Na chamada da função: colocar verificação para NÃO deixar colocar valor = 0
+// or < 0
+int comprarCreditos(Pessoa* pessoa, double valorCreditoAdicionar) {
+    if (pessoa == NULL) {
         return 0;
     }
 
-    if(pessoa->identificador != IDENTIFICADOR_ALUNO){
+    if (pessoa->identificador != IDENTIFICADOR_ALUNO) {
         return 0;
     }
 
@@ -129,7 +136,26 @@ int comprarCreditos(Pessoa *pessoa, double valorCreditoAdicionar){
     return valorCreditoAdicionar;
 }
 
-int main(){
+long double calculadorSegundos(int dia, int mes, int ano) {
+    return dia * 86400.0L + mes * 2.628e+6L + ano * 3.154e+7L;
+}
+
+int main() {
+    int estaNoDia = 0;
+
+    time_t agora = time(NULL);
+
+    struct tm dataFesta = {0};
+    dataFesta.tm_mday = 28;
+    dataFesta.tm_mon = 4;     // meses vão de 0 a 11
+    dataFesta.tm_year = 126;  // 2026 - 1900
+
+    time_t festa = mktime(&dataFesta);
+
+    if (difftime(festa, agora) > 0) {
+        estaNoDia = 1;
+    }
+
     char opcao;
     int continuar = 1;
 
@@ -138,17 +164,19 @@ int main(){
     Fila filaIdosos;
     inicializarTodasFilas(&filaAlunos, &filaComunidade, &filaIdosos);
 
-    while(continuar){
+    while (continuar) {
         menu();
         printf("\nOpção: ");
         scanf(" %c", &opcao);
 
-        switch(opcao){
-            case 'c': 
+        switch (opcao) {
+            case 'c':
+
                 char nome[255], cpf[15];
                 int identificadorPessoa;
 
-                while(getchar() != '\n'); // Limpando o buffer, resolvendo bug de leitura
+                while (getchar() !=
+                       '\n');  // Limpando o buffer, resolvendo bug de leitura
 
                 printf("\nInforme seu nome: ");
                 fgets(nome, 255, stdin);
@@ -164,30 +192,41 @@ int main(){
                 int numeroFila = destinarFila(identificadorPessoa);
 
                 // Verifica qual é a fila destinada
-                if(numeroFila != 0){
-                    if(numeroFila == IDENTIFICADOR_ALUNO){
+                if (numeroFila != 0) {
+                    if (numeroFila == IDENTIFICADOR_ALUNO) {
                         enfileirar(&filaAlunos, nome, cpf, IDENTIFICADOR_ALUNO);
 
-                    } else if(numeroFila == IDENTIFICADOR_IDOSO){
+                    } else if (numeroFila == IDENTIFICADOR_IDOSO) {
                         enfileirar(&filaIdosos, nome, cpf, IDENTIFICADOR_IDOSO);
 
-                    } else{
-                        enfileirar(&filaComunidade, nome, cpf, IDENTIFICADOR_COMUNIDADE);
+                    } else {
+                        enfileirar(&filaComunidade, nome, cpf,
+                                   IDENTIFICADOR_COMUNIDADE);
                     }
 
-                } else{
-                    printf("\nNENHUM TIPO DE VÍNCULO SUPORTADO FOI SELECIONADO!\n");
+                } else {
+                    printf(
+                        "\nNENHUM TIPO DE VÍNCULO SUPORTADO FOI "
+                        "SELECIONADO!\n");
                 }
 
                 break;
-            
-            case 'a': exibirFila(&filaAlunos); break;
-            case 'i': exibirFila(&filaIdosos); break;
-            case 'k': exibirFila(&filaComunidade); break;
-            default: printf("\nOPÇÃO INVÁLIDA!\n"); break;
+
+            case 'a':
+                exibirFila(&filaAlunos);
+                break;
+            case 'i':
+                exibirFila(&filaIdosos);
+                break;
+            case 'k':
+                exibirFila(&filaComunidade);
+                break;
+            default:
+                printf("\nOPÇÃO INVÁLIDA!\n");
+                break;
         }
     }
-    
+
     return 0;
 }
 
@@ -196,22 +235,22 @@ int main(){
 // 1 - Colocar data: antes do dia 28: 3 ingressos. No dia: ordem, sem 3
 // 2 - Código de geração de CSV aleatório: Enzo:
 
-    /* int gerarRegistros() {
-        FILE* f = fopen("participantes.csv", "w");
-        if (!f) return 0;
-        srand(time(NULL));
+/* int gerarRegistros() {
+    FILE* f = fopen("participantes.csv", "w");
+    if (!f) return 0;
+    srand(time(NULL));
 
 
-        for (int i = 0; i < MAX; i++) {
-            int comida = rand() % 3 + 1;
-            int bebida = rand() % 5 + 1;
-            int quantidadeEstoque = rand() % 3 + 1;
+    for (int i = 0; i < MAX; i++) {
+        int comida = rand() % 3 + 1;
+        int bebida = rand() % 5 + 1;
+        int quantidadeEstoque = rand() % 3 + 1;
 
 
-            fprintf(f, "%d;%d;%d;%d\n", i + 1, carne, bebida, musica);
-        }
+        fprintf(f, "%d;%d;%d;%d\n", i + 1, carne, bebida, musica);
+    }
 
 
-        fclose(f);
-        return 1;
-    } */
+    fclose(f);
+    return 1;
+} */
