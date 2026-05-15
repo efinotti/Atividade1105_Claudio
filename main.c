@@ -52,6 +52,7 @@ int inicializarTodasFilas(Fila *fAlunos, Fila *fComunidade, Fila *fIdosos){
     inicializar(fAlunos);
     inicializar(fComunidade);
     inicializar(fIdosos);
+    return 1;
 }
 
 int enfileirar(Fila *fila, char nome[255], char cpf[15], int identificador){
